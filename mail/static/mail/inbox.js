@@ -33,29 +33,36 @@ function load_mailbox(mailbox) {
   // Show the mailbox name
   document.querySelector('#emails-view').innerHTML = `<h3>${mailbox.charAt(0).toUpperCase() + mailbox.slice(1)}</h3>`;
 
-  fetch('/emails/inbox')
+  fetch(`/emails/${mailbox}`)
   .then(response => response.json())
   .then(emails => {
-
 
     // Print emails
     console.log(emails);
 
     // Display emails
     emails.forEach(email => {
-      // const sender = emails.sender;
-      // const subject = email.subject;
-      // const timestamp = email.timestamp;
+      const sender = email.sender;
+      const subject = email.subject;
+      const timestamp = email.timestamp;
       let EmailListItem = document.createElement("div");
       EmailListItem.id = email.id;
       EmailListItem.class = "email-list-item";
-      EmailListItem.innerHTML = `<div>${email.sender}</div>`
-          // <h4>${email.sender}</h4>
-          // <h4>${email.subject}</h4>
-          // <h6>${email.timestamp}</h6>
-        
+      EmailListItem.innerHTML = `
+      <div>
+        <h4>From: ${sender}</h4>
+        <h5>Subject: ${subject}</h5>
+        <h6>Date and Time: ${timestamp}</h6>
+      </div>`
+      document.querySelector('#emails-view').appendChild(EmailListItem);
+      
     });
+  })
+
+  .catch(error => {
+    console.log('Error:', error);
   });
+  return false;
 }
 
 function send_email() {

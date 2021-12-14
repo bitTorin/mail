@@ -1,3 +1,9 @@
 textarea {
     min-height: 400px;
 }
+
+.email-list-item {
+    display: block;
+    border: 1px;
+    margin: 10vw;
+}
