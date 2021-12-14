@@ -3,7 +3,9 @@ textarea {
 }
 
 .email-list-item {
-    display: block;
-    border: 1px;
-    margin: 10vw;
+    border: grey;
+    border-style: solid;
+    border-radius: 50%;
+    color: coral;
+    background-color: white;
 }

@@ -17,6 +17,7 @@ function compose_email() {
   // Show compose view and hide other views
   document.querySelector('#emails-view').style.display = 'none';
   document.querySelector('#compose-view').style.display = 'block';
+  document.querySelector('#single-email-view').style.display = 'none';
 
   // Clear out composition fields
   document.querySelector('#compose-recipients').value = '';
@@ -29,10 +30,12 @@ function load_mailbox(mailbox) {
   // Show the mailbox and hide other views
   document.querySelector('#emails-view').style.display = 'block';
   document.querySelector('#compose-view').style.display = 'none';
+  document.querySelector('#single-email-view').style.display = 'none';
 
   // Show the mailbox name
   document.querySelector('#emails-view').innerHTML = `<h3>${mailbox.charAt(0).toUpperCase() + mailbox.slice(1)}</h3>`;
 
+  // Load mailbox
   fetch(`/emails/${mailbox}`)
   .then(response => response.json())
   .then(emails => {
@@ -45,17 +48,14 @@ function load_mailbox(mailbox) {
       const sender = email.sender;
       const subject = email.subject;
       const timestamp = email.timestamp;
-      let EmailListItem = document.createElement("div");
+      let EmailListItem = document.createElement('div');
       EmailListItem.id = email.id;
-      EmailListItem.class = "email-list-item";
-      EmailListItem.innerHTML = `
-      <div>
-        <h4>From: ${sender}</h4>
-        <h5>Subject: ${subject}</h5>
-        <h6>Date and Time: ${timestamp}</h6>
-      </div>`
+      EmailListItem.className = 'email-list-item';
+      EmailListItem.innerHTML = 
+      `<h4>From: ${sender}</h4>
+      <h5>Subject: ${subject}</h5>
+      <h6>Date and Time: ${timestamp}</h6>`
       document.querySelector('#emails-view').appendChild(EmailListItem);
-      
     });
   })
 
@@ -63,6 +63,16 @@ function load_mailbox(mailbox) {
     console.log('Error:', error);
   });
   return false;
+}
+
+function view_email() {
+
+  // Show single email view and hide other views
+  document.querySelector('#emails-view').style.display = 'none';
+  document.querySelector('#compose-view').style.display = 'none';
+  document.querySelector('#single-email-view').style.display = 'block';
+
+
 }
 
 function send_email() {
