@@ -32,6 +32,30 @@ function load_mailbox(mailbox) {
 
   // Show the mailbox name
   document.querySelector('#emails-view').innerHTML = `<h3>${mailbox.charAt(0).toUpperCase() + mailbox.slice(1)}</h3>`;
+
+  fetch('/emails/inbox')
+  .then(response => response.json())
+  .then(emails => {
+
+
+    // Print emails
+    console.log(emails);
+
+    // Display emails
+    emails.forEach(email => {
+      // const sender = emails.sender;
+      // const subject = email.subject;
+      // const timestamp = email.timestamp;
+      let EmailListItem = document.createElement("div");
+      EmailListItem.id = email.id;
+      EmailListItem.class = "email-list-item";
+      EmailListItem.innerHTML = `<div>${email.sender}</div>`
+          // <h4>${email.sender}</h4>
+          // <h4>${email.subject}</h4>
+          // <h6>${email.timestamp}</h6>
+        
+    });
+  });
 }
 
 function send_email() {
