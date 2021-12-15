@@ -67,9 +67,16 @@ function load_mailbox(mailbox) {
       const subject = email.subject;
       const timestamp = email.timestamp;
       const recipients = email.recipients;
+      const read = email.read
+      console.log(read)
       let EmailListItem = document.createElement('div');
       EmailListItem.id = email.id;
-      EmailListItem.classList = 'email-list-item row';
+      if (read == true) {
+        EmailListItem.classList = 'email-list-item row background-white';
+      }
+      else {
+        EmailListItem.classList = 'email-list-item row background-grey';
+      }
       if (`${mailbox}` === 'inbox') {
         EmailListItem.innerHTML = 
         `<p class="col-3">${sender}</p>
@@ -83,13 +90,44 @@ function load_mailbox(mailbox) {
         <p class="col-3">${timestamp}</p>`
         document.querySelector('#emails-view').appendChild(EmailListItem);
       }
-      EmailListItem.addEventListener('click', () => view_email(`${EmailListItem.id}`));
+      EmailListItem.addEventListener('click', () => read_email(`${EmailListItem.id}`));
     });
   })
 
   .catch(error => {
     console.log('Error:', error);
   });
+  return false;
+}
+
+function read_email(email_id) {
+  fetch(`/emails/${email_id}`)
+
+  .then(response => response.json())
+  .then(email => {
+
+    // Assign variables
+    const read = email.read;
+
+    // If email was unread, send read udpdate to API
+    if (read == false) {
+      fetch(`/emails/${email_id}`, {
+      method: 'PUT',
+      body: JSON.stringify({
+          read: true
+        })
+      })
+    }
+      
+    // View Email
+    view_email(`${email_id}`)
+    
+  })
+
+  .catch(error => {
+    console.log('Error:', error);
+  });
+
   return false;
 }
 
@@ -106,24 +144,20 @@ function view_email(email_id) {
   // Load email
   fetch(`/emails/${email_id}`)
 
-  // PUT REQUEST FOR READ/ARCHIVED
-  // , {
-  //   method: 'PUT',
-  //   body: JSON.stringify({
-  //       read: true
-  //     })
-  // })
-
   .then(response => response.json())
   .then(email => {
+
+    // Assign variables
+    const id = email.id
     const sender = email.sender;
     const subject = email.subject;
     const timestamp = email.timestamp;
     const recipients = email.recipients;
     const body = email.body;
+
+    // Display Email
     let SingleEmail = document.createElement('div');
     SingleEmail.id = email.id;
-    // SingleEmail.classList = 'row';
     SingleEmail.innerHTML = 
         `<h3>${subject.charAt(0).toUpperCase() + subject.slice(1)}</h3>
         <br>
@@ -133,6 +167,7 @@ function view_email(email_id) {
         <br>
         <p>${body}</p>`
     document.querySelector('#single-email-view').appendChild(SingleEmail);
+    
   })
 
   .catch(error => {
