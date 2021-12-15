@@ -49,10 +49,9 @@ function load_mailbox(mailbox) {
     EmailHeader.classList = 'row'
     if (`${mailbox}` === 'inbox') {
       EmailHeader.innerHTML =
-      `<h5 class="col-2">From</h5>
-      <h5 class="col-5">Subject</h5>
-      <h5 class="col-3">Date/Time</h5>
-      <h5 class="col-1"></h5>`
+      `<h5 class="col-3">From</h5>
+      <h5 class="col-6">Subject</h5>
+      <h5 class="col-3">Date/Time</h5>`
       document.querySelector('#emails-view').appendChild(EmailHeader);
     } else if (`${mailbox}` === 'sent') {
       EmailHeader.innerHTML =
@@ -62,15 +61,16 @@ function load_mailbox(mailbox) {
       document.querySelector('#emails-view').appendChild(EmailHeader);
     } else if (`${mailbox}` === 'archive') {
       EmailHeader.innerHTML =
-      `<h5 class="col-2">From</h5>
-      <h5 class="col-5">Subject</h5>
-      <h5 class="col-3">Date/Time</h5>
-      <h5 class="col-1"></h5>`
+      `<h5 class="col-3">From</h5>
+      <h5 class="col-6">Subject</h5>
+      <h5 class="col-3">Date/Time</h5>`
       document.querySelector('#emails-view').appendChild(EmailHeader);
     }
 
     // Display emails
     emails.forEach(email => {
+      
+      // Assign variables
       const sender = email.sender;
       const subject = email.subject;
       const timestamp = email.timestamp;
@@ -78,6 +78,7 @@ function load_mailbox(mailbox) {
       const read = email.read;
       const archived = email.archived;
 
+      // Create new div
       let EmailListItem = document.createElement('div');
       EmailListItem.id = email.id;
       if (read == true) {
@@ -87,89 +88,86 @@ function load_mailbox(mailbox) {
         EmailListItem.classList = 'email-list-item row background-grey';
       }
 
-      // let btn = document.createElement('button')
-      // if (archived == true) {
-      //   btn.textContent = 'Unarchive'
-      // } else if (archived == false) {
-      //   btn.textContent = 'Archive'
-      // }
-
+      // Load inbox
       if (`${mailbox}` === 'inbox') {
         EmailListItem.innerHTML = 
-        `<p class="col-2">${sender}</p>
-        <p class="col-5">${subject.charAt(0).toUpperCase() + subject.slice(1)}</p>
-        <p class="col-3">${timestamp}</p>
-        <btn id="btn" type="button" class="btn btn-outline-secondary btn-sm col-1" style="margin: 12px;">Archive</btn>`
+        `<p class="col-3">${sender}</p>
+        <p class="col-6">${subject.charAt(0).toUpperCase() + subject.slice(1)}</p>
+        <p class="col-3">${timestamp}</p>`
         document.querySelector('#emails-view').appendChild(EmailListItem);
 
-        // if (archived == false) {
-        //   EmailListItem.innerHTML = 
-        //   `<p class="col-2">${sender}</p>
-        //   <p class="col-5">${subject.charAt(0).toUpperCase() + subject.slice(1)}</p>
-        //   <p class="col-3">${timestamp}</p>
-        //   <btn id="archive" type="button" class="btn btn-outline-secondary btn-sm col-1" style="margin: 12px;">Archive</btn>`
-        //   document.querySelector('#emails-view').appendChild(EmailListItem);
-        // }
-        // else if (archived == true) {
-        //   EmailListItem.innerHTML = 
-        //   `<p class="col-2">${sender}</p>
-        //   <p class="col-5">${subject.charAt(0).toUpperCase() + subject.slice(1)}</p>
-        //   <p class="col-3">${timestamp}</p>
-        //   <btn id="archive" type="button" class="btn btn-secondary btn-sm col-1" style="margin: 12px;">Unarchive</btn>`
-        //   document.querySelector('#emails-view').appendChild(EmailListItem);
-        // }
+      // Load sent
       } else if (`${mailbox}` === 'sent') {
         EmailListItem.innerHTML = 
         `<p class="col-3 overflow">${recipients}</p>
         <p class="col-6">${subject.charAt(0).toUpperCase() + subject.slice(1)}</p>
         <p class="col-3">${timestamp}</p>`
         document.querySelector('#emails-view').appendChild(EmailListItem);
+
+      // Load archive
       } else if (`${mailbox}` === 'archive') {
         EmailListItem.innerHTML = 
-          `<p class="col-2">${sender}</p>
-          <p class="col-5">${subject.charAt(0).toUpperCase() + subject.slice(1)}</p>
-          <p class="col-3">${timestamp}</p>
-          <btn id="btn" type="button" class="btn btn-secondary btn-sm col-1" style="margin: 12px;">Unarchive</btn>`
+          `<p class="col-3">${sender}</p>
+          <p class="col-6">${subject.charAt(0).toUpperCase() + subject.slice(1)}</p>
+          <p class="col-3">${timestamp}</p>`
           document.querySelector('#emails-view').appendChild(EmailListItem);
       }
+
+      // Open email when clicked
       EmailListItem.addEventListener('click', () => read_email(`${EmailListItem.id}`));
-      document.querySelector('#btn').addEventListener('click', () => archive(`${EmailListItem.id}, ${archived}`));
     });
   })
 
+  // Catch errors
   .catch(error => {
     console.log('Error:', error);
   });
   return false;
 }
 
-function archive(email_id, status) {
+function archive(email_id) {
   
-  if (status == false) {
-    fetch(`/emails/${email_id}`, {
-      method: 'PUT',
-      body: JSON.stringify({
-          archived: true
+  fetch(`/emails/${email_id}`)
+
+  .then(response => response.json())
+  .then(email => {
+
+    // Assign variables
+    const archived = email.archived;
+    
+    // Change archive status
+    if (archived == false) {
+      fetch(`/emails/${email_id}`, {
+        method: 'PUT',
+        body: JSON.stringify({
+            archived: true
+          })
         })
+        .then(
+          // View Inbox
+          load_mailbox('inbox')
+        )
+    } else if (archived == true) {
+      fetch(`/emails/${email_id}`, {
+        method: 'PUT',
+        body: JSON.stringify({
+            archived: false
+          })
       })
-  }
+      .then(
+        // View Inbox
+        load_mailbox('inbox')
+      )
+    }
+  })
 
-  else if (status == true) {
-    fetch(`/emails/${email_id}`, {
-      method: 'PUT',
-      body: JSON.stringify({
-          archived: false
-        })
-    })
-  } 
-
-  // View Email
-  load_mailbox('inbox')
-
+  // Catch errors
   .catch(error => {
     console.log('Error:', error);
   });
   return false;
+
+  
 }
 
 function read_email(email_id) {
@@ -203,6 +201,20 @@ function read_email(email_id) {
   return false;
 }
 
+function reply(email_id) {
+  // Load email
+  fetch(`/emails/${email_id}`)
+
+  .then(response => response.json())
+  .then(email => {
+    const sender = email.sender;
+    const subject = email.subject;
+    const timestamp = email.timestamp;
+    const recipients = email.recipients;
+    const body = email.body;
+  })
+}
+
 function view_email(email_id) {
 
   // Show single email view and hide other views
@@ -226,19 +238,54 @@ function view_email(email_id) {
     const timestamp = email.timestamp;
     const recipients = email.recipients;
     const body = email.body;
+    const archived = email.archived;
 
-    // Display Email
-    let SingleEmail = document.createElement('div');
-    SingleEmail.id = email.id;
-    SingleEmail.innerHTML = 
-        `<h3>${subject.charAt(0).toUpperCase() + subject.slice(1)}</h3>
-        <br>
-        <p>From: ${sender}<p>
-        <p>To: ${recipients}</p>
-        <p>${timestamp}</p>
-        <br>
-        <p>${body}</p>`
-    document.querySelector('#single-email-view').appendChild(SingleEmail);
+    if (archived == true) {
+      // Display Email
+      let SingleEmail = document.createElement('div');
+      SingleEmail.id = email.id;
+      SingleEmail.innerHTML = 
+          `<btn id="reply" type="button" class="btn btn-primary btn-sm col-1">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-reply-fill" viewBox="0 0 16 16">
+              <path d="M5.921 11.9 1.353 8.62a.719.719 0 0 1 0-1.238L5.921 4.1A.716.716 0 0 1 7 4.719V6c1.5 0 6 0 7 8-2.5-4.5-7-4-7-4v1.281c0 .56-.606.898-1.079.62z"/>
+            </svg>
+            Reply
+          </btn>
+          <btn id="archive" type="button" class="btn btn-secondary btn-sm col-1" style="margin: 12px;">Unarchive</btn>
+          <br>
+          <h3>${subject.charAt(0).toUpperCase() + subject.slice(1)}</h3>
+          <br>
+          <p>From: ${sender}<p>
+          <p>To: ${recipients}</p>
+          <p>${timestamp}</p>
+          <br>
+          <p>${body}</p>`
+      document.querySelector('#single-email-view').appendChild(SingleEmail);
+      
+    } else if (archived == false) {
+      // Display Email
+      let SingleEmail = document.createElement('div');
+      SingleEmail.id = email.id;
+      SingleEmail.innerHTML = 
+          `<btn id="reply" type="button" class="btn btn-primary btn-sm col-1">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-reply-fill" viewBox="0 0 16 16">
+              <path d="M5.921 11.9 1.353 8.62a.719.719 0 0 1 0-1.238L5.921 4.1A.716.716 0 0 1 7 4.719V6c1.5 0 6 0 7 8-2.5-4.5-7-4-7-4v1.281c0 .56-.606.898-1.079.62z"/>
+            </svg>
+            Reply
+          </btn>
+          <btn id="archive" type="button" class="btn btn-outline-secondary btn-sm col-1" style="margin: 12px;">Archive</btn>
+          <br>
+          <h3>${subject.charAt(0).toUpperCase() + subject.slice(1)}</h3>
+          <br>
+          <p>From: ${sender}<p>
+          <p>To: ${recipients}</p>
+          <p>${timestamp}</p>
+          <br>
+          <p>${body}</p>`
+      document.querySelector('#single-email-view').appendChild(SingleEmail);
+    }
+    document.querySelector('#archive').addEventListener('click', () => archive(`${email.id}`));
+    document.querySelector('#archive').addEventListener('click', () => reply(`${email.id}`));
     
   })
 
