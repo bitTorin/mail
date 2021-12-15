@@ -69,17 +69,17 @@ function load_mailbox(mailbox) {
       const recipients = email.recipients;
       let EmailListItem = document.createElement('div');
       EmailListItem.id = email.id;
-      EmailListItem.classList = 'email-list-item row overflow';
+      EmailListItem.classList = 'email-list-item row';
       if (`${mailbox}` === 'inbox') {
         EmailListItem.innerHTML = 
-        `<h5 class="col-3">${sender}</h5>
-        <h5 class="col-6">${subject.charAt(0).toUpperCase() + subject.slice(1)}</h5>
+        `<p class="col-3">${sender}</p>
+        <p class="col-6">${subject.charAt(0).toUpperCase() + subject.slice(1)}</p>
         <p class="col-3">${timestamp}</p>`
         document.querySelector('#emails-view').appendChild(EmailListItem);
       } else if (`${mailbox}` === 'sent') {
         EmailListItem.innerHTML = 
-        `<h5 class="col-3">${recipients}</h5>
-        <h5 class="col-6">${subject.charAt(0).toUpperCase() + subject.slice(1)}</h5>
+        `<p class="col-3 overflow">${recipients}</p>
+        <p class="col-6">${subject.charAt(0).toUpperCase() + subject.slice(1)}</p>
         <p class="col-3">${timestamp}</p>`
         document.querySelector('#emails-view').appendChild(EmailListItem);
       }

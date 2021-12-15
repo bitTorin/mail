@@ -11,15 +11,10 @@ textarea {
 }
 
 .email-list-item {
-    display: block;
-    box-sizing: border-box;
-    -moz-box-sizing: border-box;
-    -webkit-box-sizing: border-box;
-    border: 2px solid #969696;
-    margin: 10px;
-    border-radius: 50%;
-    color: coral;
-    
+    border: 1px solid black;
+    border-radius: 5px;
+    padding-top: 16px;
+    margin-bottom: 1px;
 }
 
 .overflow {
