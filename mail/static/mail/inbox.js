@@ -49,15 +49,23 @@ function load_mailbox(mailbox) {
     EmailHeader.classList = 'row'
     if (`${mailbox}` === 'inbox') {
       EmailHeader.innerHTML =
-      `<h5 class="col-3">From</h5>
-      <h5 class="col-6">Subject</h5>
-      <h5 class="col-3">Date/Time</h5>`
+      `<h5 class="col-2">From</h5>
+      <h5 class="col-5">Subject</h5>
+      <h5 class="col-3">Date/Time</h5>
+      <h5 class="col-1"></h5>`
       document.querySelector('#emails-view').appendChild(EmailHeader);
     } else if (`${mailbox}` === 'sent') {
       EmailHeader.innerHTML =
       `<h5 class="col-3">To</h5>
       <h5 class="col-6">Subject</h5>
       <h5 class="col-3">Date/Time</h5>`
+      document.querySelector('#emails-view').appendChild(EmailHeader);
+    } else if (`${mailbox}` === 'archive') {
+      EmailHeader.innerHTML =
+      `<h5 class="col-2">From</h5>
+      <h5 class="col-5">Subject</h5>
+      <h5 class="col-3">Date/Time</h5>
+      <h5 class="col-1"></h5>`
       document.querySelector('#emails-view').appendChild(EmailHeader);
     }
 
@@ -67,8 +75,9 @@ function load_mailbox(mailbox) {
       const subject = email.subject;
       const timestamp = email.timestamp;
       const recipients = email.recipients;
-      const read = email.read
-      console.log(read)
+      const read = email.read;
+      const archived = email.archived;
+
       let EmailListItem = document.createElement('div');
       EmailListItem.id = email.id;
       if (read == true) {
@@ -77,22 +86,85 @@ function load_mailbox(mailbox) {
       else {
         EmailListItem.classList = 'email-list-item row background-grey';
       }
+
+      // let btn = document.createElement('button')
+      // if (archived == true) {
+      //   btn.textContent = 'Unarchive'
+      // } else if (archived == false) {
+      //   btn.textContent = 'Archive'
+      // }
+
       if (`${mailbox}` === 'inbox') {
         EmailListItem.innerHTML = 
-        `<p class="col-3">${sender}</p>
-        <p class="col-6">${subject.charAt(0).toUpperCase() + subject.slice(1)}</p>
-        <p class="col-3">${timestamp}</p>`
+        `<p class="col-2">${sender}</p>
+        <p class="col-5">${subject.charAt(0).toUpperCase() + subject.slice(1)}</p>
+        <p class="col-3">${timestamp}</p>
+        <btn id="btn" type="button" class="btn btn-outline-secondary btn-sm col-1" style="margin: 12px;">Archive</btn>`
         document.querySelector('#emails-view').appendChild(EmailListItem);
+
+        // if (archived == false) {
+        //   EmailListItem.innerHTML = 
+        //   `<p class="col-2">${sender}</p>
+        //   <p class="col-5">${subject.charAt(0).toUpperCase() + subject.slice(1)}</p>
+        //   <p class="col-3">${timestamp}</p>
+        //   <btn id="archive" type="button" class="btn btn-outline-secondary btn-sm col-1" style="margin: 12px;">Archive</btn>`
+        //   document.querySelector('#emails-view').appendChild(EmailListItem);
+        // }
+        // else if (archived == true) {
+        //   EmailListItem.innerHTML = 
+        //   `<p class="col-2">${sender}</p>
+        //   <p class="col-5">${subject.charAt(0).toUpperCase() + subject.slice(1)}</p>
+        //   <p class="col-3">${timestamp}</p>
+        //   <btn id="archive" type="button" class="btn btn-secondary btn-sm col-1" style="margin: 12px;">Unarchive</btn>`
+        //   document.querySelector('#emails-view').appendChild(EmailListItem);
+        // }
       } else if (`${mailbox}` === 'sent') {
         EmailListItem.innerHTML = 
         `<p class="col-3 overflow">${recipients}</p>
         <p class="col-6">${subject.charAt(0).toUpperCase() + subject.slice(1)}</p>
         <p class="col-3">${timestamp}</p>`
         document.querySelector('#emails-view').appendChild(EmailListItem);
+      } else if (`${mailbox}` === 'archive') {
+        EmailListItem.innerHTML = 
+          `<p class="col-2">${sender}</p>
+          <p class="col-5">${subject.charAt(0).toUpperCase() + subject.slice(1)}</p>
+          <p class="col-3">${timestamp}</p>
+          <btn id="btn" type="button" class="btn btn-secondary btn-sm col-1" style="margin: 12px;">Unarchive</btn>`
+          document.querySelector('#emails-view').appendChild(EmailListItem);
       }
       EmailListItem.addEventListener('click', () => read_email(`${EmailListItem.id}`));
+      document.querySelector('#btn').addEventListener('click', () => archive(`${EmailListItem.id}, ${archived}`));
     });
   })
+
+  .catch(error => {
+    console.log('Error:', error);
+  });
+  return false;
+}
+
+function archive(email_id, status) {
+  
+  if (status == false) {
+    fetch(`/emails/${email_id}`, {
+      method: 'PUT',
+      body: JSON.stringify({
+          archived: true
+        })
+      })
+  }
+
+  else if (status == true) {
+    fetch(`/emails/${email_id}`, {
+      method: 'PUT',
+      body: JSON.stringify({
+          archived: false
+        })
+    })
+  } 
+
+  // View Email
+  load_mailbox('inbox')
 
   .catch(error => {
     console.log('Error:', error);
