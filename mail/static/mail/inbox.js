@@ -202,17 +202,34 @@ function read_email(email_id) {
 }
 
 function reply(email_id) {
-  // Load email
+  
   fetch(`/emails/${email_id}`)
 
   .then(response => response.json())
   .then(email => {
+
+    // Assign variables
     const sender = email.sender;
     const subject = email.subject;
     const timestamp = email.timestamp;
-    const recipients = email.recipients;
     const body = email.body;
+    
+    const re_body = 'On ' + timestamp + ' ' + sender + ' wrote: \n';
+    
+    // Load compose email page
+    compose_email();
+
+    // Replace field values
+    document.querySelector('#compose-recipients').value = sender;
+    document.querySelector('#compose-subject').value = subject.slice(0,4) === "Re: " ? subject : "Re: " + subject;
+    document.querySelector('#compose-body').value = re_body + body;
+  
   })
+
+  .catch(error => {
+    console.log('Error:', error);
+  });
+  return false;
 }
 
 function view_email(email_id) {
@@ -285,7 +302,7 @@ function view_email(email_id) {
       document.querySelector('#single-email-view').appendChild(SingleEmail);
     }
     document.querySelector('#archive').addEventListener('click', () => archive(`${email.id}`));
-    document.querySelector('#archive').addEventListener('click', () => reply(`${email.id}`));
+    document.querySelector('#reply').addEventListener('click', () => reply(`${email.id}`));
     
   })
 
