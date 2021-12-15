@@ -12,9 +12,15 @@ textarea {
 
 .email-list-item {
     border: 1px solid black;
-    border-radius: 5px;
     padding-top: 16px;
-    margin-bottom: 1px;
+    margin-bottom: -1px;
+    opacity: 85%;
+}
+
+.email-list-item:hover {
+    cursor: pointer;
+    box-shadow: 0px 4px 4px grey;
+    opacity: 100%;
 }
 
 .overflow {

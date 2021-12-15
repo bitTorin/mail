@@ -83,6 +83,7 @@ function load_mailbox(mailbox) {
         <p class="col-3">${timestamp}</p>`
         document.querySelector('#emails-view').appendChild(EmailListItem);
       }
+      EmailListItem.addEventListener('click', () => view_email(`${EmailListItem.id}`));
     });
   })
 
@@ -92,14 +93,52 @@ function load_mailbox(mailbox) {
   return false;
 }
 
-function view_email() {
+function view_email(email_id) {
 
   // Show single email view and hide other views
   document.querySelector('#emails-view').style.display = 'none';
   document.querySelector('#compose-view').style.display = 'none';
   document.querySelector('#single-email-view').style.display = 'block';
 
+  // Clear any previous queries
+  document.querySelector('#single-email-view').innerHTML='';
 
+  // Load email
+  fetch(`/emails/${email_id}`)
+
+  // PUT REQUEST FOR READ/ARCHIVED
+  // , {
+  //   method: 'PUT',
+  //   body: JSON.stringify({
+  //       read: true
+  //     })
+  // })
+
+  .then(response => response.json())
+  .then(email => {
+    const sender = email.sender;
+    const subject = email.subject;
+    const timestamp = email.timestamp;
+    const recipients = email.recipients;
+    const body = email.body;
+    let SingleEmail = document.createElement('div');
+    SingleEmail.id = email.id;
+    // SingleEmail.classList = 'row';
+    SingleEmail.innerHTML = 
+        `<h3>${subject.charAt(0).toUpperCase() + subject.slice(1)}</h3>
+        <br>
+        <p>From: ${sender}<p>
+        <p>To: ${recipients}</p>
+        <p>${timestamp}</p>
+        <br>
+        <p>${body}</p>`
+    document.querySelector('#single-email-view').appendChild(SingleEmail);
+  })
+
+  .catch(error => {
+    console.log('Error:', error);
+  });
+  return false;
 }
 
 function send_email() {
