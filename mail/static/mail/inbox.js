@@ -43,19 +43,46 @@ function load_mailbox(mailbox) {
     // Print emails
     console.log(emails);
 
+    // Create mailbox header
+    let EmailHeader = document.createElement('div');
+    EmailHeader.id = 'mailbox-header'
+    EmailHeader.classList = 'row'
+    if (`${mailbox}` === 'inbox') {
+      EmailHeader.innerHTML =
+      `<h5 class="col-3">From</h5>
+      <h5 class="col-6">Subject</h5>
+      <h5 class="col-3">Date/Time</h5>`
+      document.querySelector('#emails-view').appendChild(EmailHeader);
+    } else if (`${mailbox}` === 'sent') {
+      EmailHeader.innerHTML =
+      `<h5 class="col-3">To</h5>
+      <h5 class="col-6">Subject</h5>
+      <h5 class="col-3">Date/Time</h5>`
+      document.querySelector('#emails-view').appendChild(EmailHeader);
+    }
+
     // Display emails
     emails.forEach(email => {
       const sender = email.sender;
       const subject = email.subject;
       const timestamp = email.timestamp;
+      const recipients = email.recipients;
       let EmailListItem = document.createElement('div');
       EmailListItem.id = email.id;
-      EmailListItem.className = 'email-list-item';
-      EmailListItem.innerHTML = 
-      `<h4>From: ${sender}</h4>
-      <h5>Subject: ${subject}</h5>
-      <h6>Date and Time: ${timestamp}</h6>`
-      document.querySelector('#emails-view').appendChild(EmailListItem);
+      EmailListItem.classList = 'email-list-item row overflow';
+      if (`${mailbox}` === 'inbox') {
+        EmailListItem.innerHTML = 
+        `<h5 class="col-3">${sender}</h5>
+        <h5 class="col-6">${subject.charAt(0).toUpperCase() + subject.slice(1)}</h5>
+        <p class="col-3">${timestamp}</p>`
+        document.querySelector('#emails-view').appendChild(EmailListItem);
+      } else if (`${mailbox}` === 'sent') {
+        EmailListItem.innerHTML = 
+        `<h5 class="col-3">${recipients}</h5>
+        <h5 class="col-6">${subject.charAt(0).toUpperCase() + subject.slice(1)}</h5>
+        <p class="col-3">${timestamp}</p>`
+        document.querySelector('#emails-view').appendChild(EmailListItem);
+      }
     });
   })
 

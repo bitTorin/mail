@@ -2,10 +2,28 @@ textarea {
     min-height: 400px;
 }
 
+.background-white {
+    background-color: white;
+}
+
+.background-grey {
+    background-color: grey;
+}
+
 .email-list-item {
-    border: grey;
-    border-style: solid;
+    display: block;
+    box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+    border: 2px solid #969696;
+    margin: 10px;
     border-radius: 50%;
     color: coral;
-    background-color: white;
+    
+}
+
+.overflow {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
 }
